@@ -33,6 +33,8 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"
 .row{display:grid;grid-template-columns:52px 1fr;gap:8px;padding:8px 10px;border-top:1px solid var(--line);cursor:pointer;align-items:center}
 .row:first-child{border-top:0}
 .row .d{font-size:13px;font-weight:600}.row .d small{display:block;color:var(--muted);font-weight:400}
+.row.today{box-shadow:inset 0 0 0 2px #2e9e6b;border-radius:10px}
+.cell.today span{box-shadow:0 0 0 2px #2e9e6b;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
 .bar{position:relative;height:9px;border-radius:5px;background:var(--line);margin:3px 0}
 .bar i{position:absolute;top:0;bottom:0;border-radius:5px}
 .scale{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);padding:6px 10px 0 70px}
@@ -128,7 +130,7 @@ function weekView(){
   var m=monday(cur),out='<div class="scale"><span>'+START+'</span><span>14</span><span>18</span><span>22</span></div>';
   for(var i=0;i<7;i++){
     var d=new Date(m);d.setDate(m.getDate()+i);var k=iso(d);
-    out+='<div class="row" data-d="'+k+'"><div class="d">'+WD[i]+'<small>'+d.getDate()+'</small></div><div>'+
+    out+='<div class="row'+(k===todayIso?' today':'')+'" data-d="'+k+'"><div class="d">'+WD[i]+'<small>'+d.getDate()+'</small></div><div>'+
      '<div class="bar">'+segs(k,"Controll Room")+'</div><div class="bar">'+segs(k,"Tone Room")+'</div></div></div>';
   }
   $("empty").textContent="Нажми на день, чтобы открыть его подробно";
@@ -141,7 +143,7 @@ function monthView(){
     var d=new Date(m);d.setDate(m.getDate()+i);
     if(i>=35&&d.getMonth()!==cur.getMonth())break;
     var k=iso(d),b=on(k),w=[];b.forEach(function(x){if(w.indexOf(x.who)<0)w.push(x.who)});
-    out+='<div class="cell'+(d.getMonth()!==cur.getMonth()?' out':'')+'" data-d="'+k+'"><span>'+d.getDate()+'</span><div class="dots">'+w.map(function(n){return '<i style="background:'+col(n)+'"></i>'}).join("")+'</div></div>';
+    out+='<div class="cell'+(d.getMonth()!==cur.getMonth()?' out':'')+(k===todayIso?' today':'')+'" data-d="'+k+'"><span>'+d.getDate()+'</span><div class="dots">'+w.map(function(n){return '<i style="background:'+col(n)+'"></i>'}).join("")+'</div></div>';
   }
   $("empty").textContent="Нажми на день, чтобы открыть его подробно";
   return out+'</div>';
@@ -153,6 +155,7 @@ function title(){
   return MONN[cur.getMonth()]+" "+cur.getFullYear();
 }
 function render(){
+  todayIso=iso(new Date());
   $("ttl").className="ttl"+(view==="day"&&iso(cur)===iso(new Date())?" now":"");
   document.querySelectorAll("#tabs button").forEach(function(b){b.className=b.dataset.v===view?"on":""});
   $("title").textContent=title();
