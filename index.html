@@ -26,7 +26,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"
 .hr{height:44px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);padding:2px 4px}
 .lines div{height:44px;border-top:1px solid var(--line)}
 .lines{position:absolute;inset:0}
-.ev{position:absolute;left:3px;right:3px;border-radius:8px;padding:4px 6px;font-size:12px;color:#fff;overflow:hidden}
+.ev{position:absolute;left:3px;right:3px;border-radius:8px;padding:4px 6px;font-size:12px;color:#fff;overflow:hidden;cursor:pointer}
 .ev b{display:block}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;font-size:12px;color:var(--muted);margin-top:10px}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
@@ -42,31 +42,38 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"
 .cell.out{opacity:.3}
 .dots{display:flex;gap:3px}.dots i{width:7px;height:7px;border-radius:50%}
 .free{text-align:center;color:var(--muted);font-size:13px;margin-top:12px}
-.ev{cursor:pointer}
 .actions{display:flex;gap:8px;margin-bottom:12px}
 .actions button{flex:1;border:0;border-radius:12px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;background:var(--a);color:#fff}
 .actions button.sec{background:var(--card);color:var(--text)}
 .sheet{position:fixed;inset:0;z-index:10;display:none}
 .sheet.open{display:block}
 .sh-bg{position:absolute;inset:0;background:rgba(0,0,0,.5)}
-.sh-body{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--card);border-radius:18px 18px 0 0;padding:16px;max-width:640px;margin:0 auto}
+.sh-body{position:absolute;left:0;right:0;bottom:0;max-height:90vh;overflow:auto;background:var(--card);border-radius:18px 18px 0 0;padding:16px;max-width:640px;margin:0 auto}
 .sh-body h3{margin:0 0 12px;font-size:17px}
 .f{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
-.sh-body input[type=text],.sh-body input[type=date],.sh-body input[type=time],.sh-body input[type=number],.sh-body textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:15px;font-family:inherit}
+.sh-body input[type=text],.sh-body input[type=date],.sh-body input[type=time],.sh-body input[type=number],.sh-body select,.sh-body textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:15px;font-family:inherit}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .chk{display:flex;gap:16px;flex-wrap:wrap}
 .chk label{display:flex;align-items:center;gap:6px;font-size:15px}
 .btn{width:100%;border:0;border-radius:12px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;background:var(--a);color:#fff;margin-top:12px}
 .btn.red{background:#e5484d}
 .btn.gray{background:var(--bg);color:var(--text)}
+.btn.alt{background:var(--bg);color:var(--text);border:1px solid var(--line)}
 .btn[disabled]{opacity:.6}
 .err{color:#e5484d;font-size:13px;margin-top:10px;min-height:16px}
+.hint{color:var(--muted);font-size:13px;margin:6px 0}
 .kv{font-size:14px;margin:6px 0}.kv span{color:var(--muted)}
 .arow{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
 .arow input[type=color]{width:32px;height:32px;border:0;padding:0;background:none;flex:none}
-.arow .nm{flex:1;font-size:14px}.arow .nm small{display:block;color:var(--muted)}
-.arow button{border:0;background:var(--bg);color:var(--text);border-radius:8px;padding:8px 10px;cursor:pointer;font-size:13px}
-.arow input[type=number]{flex:1}
+.arow .nm{flex:1;font-size:14px;min-width:0}.arow .nm small{display:block;color:var(--muted)}
+.arow button{border:0;background:var(--bg);color:var(--text);border-radius:8px;padding:8px 10px;cursor:pointer;font-size:13px;flex:none}
+.arow input[type=text]{flex:1;min-width:0}
+.cmts{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.cmts h4{margin:0 0 6px;font-size:14px}
+.cm{padding:8px 10px;background:var(--bg);border-radius:10px;margin:6px 0;font-size:14px;overflow-wrap:anywhere}
+.cm .ch{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:2px}
+.cm .ch b{color:var(--text)}
+.cm .ch button{margin-left:auto;border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
 </style>
 </head>
 <body>
@@ -92,7 +99,10 @@ var cur=new Date();cur.setHours(12,0,0,0);
 var MON=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 var MONN=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
 var WD=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+function $(id){return document.getElementById(id)}
+function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fmtD(s){var p=s.split("-");return p[2]+"."+p[1]}
 function mins(t){var p=t.split(":");return +p[0]*60+ +p[1]}
 function on(day){return bookings.filter(function(b){return b.date===day})}
 function monday(d){var x=new Date(d);x.setDate(x.getDate()-(x.getDay()+6)%7);return x}
@@ -105,11 +115,11 @@ function dayView(){
   var d=iso(cur),hrs="",ln="",ev={c1:"",c2:""},n=0;
   for(var h=START;h<END;h++){hrs+='<div class="hr">'+h+':00</div>';ln+="<div></div>"}
   on(d).forEach(function(b){b.rooms.forEach(function(r){
-    var k=r==="Controll Room"?"c1":"c2",cls=k==="c1"?"c":"t";
+    var k=r==="Controll Room"?"c1":"c2";
     var top=(mins(b.from)-START*60)/60*H,hg=(mins(b.to)-mins(b.from))/60*H;
-    ev[k]+='<div class="ev" data-g="'+esc(b.g)+'" style="background:'+col(b.who)+';top:'+top+'px;height:'+hg+'px"><b>'+esc(b.who)+'</b>'+b.from+'–'+b.to+(b.note?'<br>'+esc(b.note):'')+'</div>';n++})});
+    ev[k]+='<div class="ev" data-g="'+esc(b.g)+'" style="background:'+col(b.who)+';top:'+top+'px;height:'+hg+'px"><b>'+esc(b.who)+(b.s?' ↻':'')+'</b>'+b.from+'–'+b.to+(b.note?'<br>'+esc(b.note):'')+'</div>';n++})});
   var hh=(END-START)*H;
-  document.getElementById("empty").textContent=n?"":"В этот день студия свободна";
+  $("empty").textContent=n?"":"В этот день студия свободна";
   return '<div class="grid"><div class="head"></div><div class="head">Controll Room</div><div class="head">Tone Room</div><div>'+hrs+'</div>'+
    '<div class="col" style="height:'+hh+'px"><div class="lines">'+ln+'</div>'+ev.c1+'</div>'+
    '<div class="col" style="height:'+hh+'px"><div class="lines">'+ln+'</div>'+ev.c2+'</div></div>';
@@ -118,10 +128,10 @@ function weekView(){
   var m=monday(cur),out='<div class="scale"><span>'+START+'</span><span>14</span><span>18</span><span>22</span></div>';
   for(var i=0;i<7;i++){
     var d=new Date(m);d.setDate(m.getDate()+i);var k=iso(d);
-    out+='<div class="row'+(k===todayIso?' today':'')+'" data-d="'+k+'"><div class="d">'+WD[i]+'<small>'+d.getDate()+'</small></div><div>'+
+    out+='<div class="row" data-d="'+k+'"><div class="d">'+WD[i]+'<small>'+d.getDate()+'</small></div><div>'+
      '<div class="bar">'+segs(k,"Controll Room")+'</div><div class="bar">'+segs(k,"Tone Room")+'</div></div></div>';
   }
-  document.getElementById("empty").textContent="Нажми на день, чтобы открыть его подробно";
+  $("empty").textContent="Нажми на день, чтобы открыть его подробно";
   return out;
 }
 function monthView(){
@@ -131,9 +141,9 @@ function monthView(){
     var d=new Date(m);d.setDate(m.getDate()+i);
     if(i>=35&&d.getMonth()!==cur.getMonth())break;
     var k=iso(d),b=on(k),w=[];b.forEach(function(x){if(w.indexOf(x.who)<0)w.push(x.who)});
-    out+='<div class="cell'+(d.getMonth()!==cur.getMonth()?' out':'')+(k===todayIso?' today':'')+'" data-d="'+k+'"><span>'+d.getDate()+'</span><div class="dots">'+w.map(function(n){return '<i style="background:'+col(n)+'"></i>'}).join("")+'</div></div>';
+    out+='<div class="cell'+(d.getMonth()!==cur.getMonth()?' out':'')+'" data-d="'+k+'"><span>'+d.getDate()+'</span><div class="dots">'+w.map(function(n){return '<i style="background:'+col(n)+'"></i>'}).join("")+'</div></div>';
   }
-  document.getElementById("empty").textContent="Нажми на день, чтобы открыть его подробно";
+  $("empty").textContent="Нажми на день, чтобы открыть его подробно";
   return out+'</div>';
 }
 function title(){
@@ -143,11 +153,11 @@ function title(){
   return MONN[cur.getMonth()]+" "+cur.getFullYear();
 }
 function render(){
-  document.getElementById("ttl").className="ttl"+(view==="day"&&iso(cur)===iso(new Date())?" now":"");
+  $("ttl").className="ttl"+(view==="day"&&iso(cur)===iso(new Date())?" now":"");
   document.querySelectorAll("#tabs button").forEach(function(b){b.className=b.dataset.v===view?"on":""});
-  document.getElementById("title").textContent=title();
-  document.getElementById("legend").innerHTML=Object.keys(admins).map(function(n){return '<span><i class="dot" style="background:'+col(n)+'"></i>'+esc(n)+'</span>'}).join("")+(view==="week"?'<span>· верх — Controll, низ — Tone</span>':'');
-  document.getElementById("app").innerHTML=view==="day"?dayView():view==="week"?weekView():monthView();
+  $("title").textContent=title();
+  $("legend").innerHTML=Object.keys(admins).map(function(n){return '<span><i class="dot" style="background:'+col(n)+'"></i>'+esc(n)+'</span>'}).join("")+(view==="week"?'<span>· верх — Controll, низ — Tone</span>':'');
+  $("app").innerHTML=view==="day"?dayView():view==="week"?weekView():monthView();
   document.querySelectorAll(".ev").forEach(function(e){e.onclick=function(){detail(e.dataset.g)}});
   document.querySelectorAll("[data-d]").forEach(function(e){e.onclick=function(){
     var p=e.dataset.d.split("-");cur=new Date(+p[0],+p[1]-1,+p[2],12);view="day";render()}});
@@ -158,29 +168,29 @@ function shift(s){
   else{cur.setDate(1);cur.setMonth(cur.getMonth()+s)}
   render();
 }
-document.getElementById("prev").onclick=function(){shift(-1)};
-document.getElementById("next").onclick=function(){shift(1)};
-document.getElementById("today").onclick=function(){cur=new Date();cur.setHours(12,0,0,0);render()};
+$("prev").onclick=function(){shift(-1)};
+$("next").onclick=function(){shift(1)};
+$("today").onclick=function(){cur=new Date();cur.setHours(12,0,0,0);render()};
 document.querySelectorAll("#tabs button").forEach(function(b){b.onclick=function(){view=b.dataset.v;render()}});
 
+/* ---------- данные из Supabase ---------- */
 var SB="https://uocguwqpprtjuxgpensb.supabase.co",KEY="sb_publishable_di1C9QH_sey3xppSjiZQeg_DGJed82g",TZ="Europe/Kaliningrad";
 function api(p){return fetch(SB+"/rest/v1/"+p,{headers:{apikey:KEY}}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})}
 var fmt=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"});
 function loc(s){var o={};fmt.formatToParts(new Date(s)).forEach(function(p){o[p.type]=p.value});return{d:o.year+"-"+o.month+"-"+o.day,t:o.hour+":"+o.minute}}
-var INIT="",ME=null,ADM=[];
+var INIT="",ME=null,ADM=[],curG=null;
 try{if(window.Telegram&&Telegram.WebApp)INIT=Telegram.WebApp.initData||""}catch(e){}
-function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 
 function load(){
-  return Promise.all([api("admins?select=telegram_id,name,color,is_owner&order=name"),api("bookings?select=group_id,room,start_at,end_at,note,admin_id,admins(name,color)&order=start_at")]).then(function(r){
+  return Promise.all([api("admins?select=telegram_id,name,color,is_owner,username&order=name"),api("bookings?select=group_id,series_id,room,start_at,end_at,note,admin_id,admins(name,color)&order=start_at")]).then(function(r){
     ADM=r[0];admins={};r[0].forEach(function(a){admins[a.name]=a.color});
     var g={};
     r[1].forEach(function(b){var s=loc(b.start_at),e=loc(b.end_at);
-      if(!g[b.group_id])g[b.group_id]={g:b.group_id,aid:b.admin_id,date:s.d,rooms:[],from:s.t,to:e.d===s.d?e.t:"24:00",who:b.admins.name,note:b.note||""};
+      if(!g[b.group_id])g[b.group_id]={g:b.group_id,s:b.series_id,aid:b.admin_id,date:s.d,rooms:[],from:s.t,to:e.d===s.d?e.t:"24:00",who:b.admins.name,note:b.note||""};
       g[b.group_id].rooms.push(b.room)});
     bookings=Object.keys(g).map(function(k){return g[k]});
     render();
-  }).catch(function(e){document.getElementById("empty").textContent="Не удалось загрузить данные ("+e.message+")"});
+  }).catch(function(e){$("empty").textContent="Не удалось загрузить данные ("+e.message+")"});
 }
 
 /* ---------- запись и админка (через серверную функцию) ---------- */
@@ -189,85 +199,130 @@ function call(action,data){
   return fetch(SB+"/functions/v1/smart-worker",{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify(b)})
     .then(function(r){return r.json().then(function(j){if(!r.ok)throw j;return j})});
 }
-var ERR={busy:"Это время уже занято в выбранной комнате",bad_time:"Проверь время: «До» должно быть позже «С»",bad_rooms:"Выбери хотя бы одну комнату",not_admin:"Ты не админ",forbidden:"Нет прав на это действие",unauthorized:"Не удалось подтвердить Telegram. Закрой и открой приложение заново",exists:"Такой админ уже есть",has_bookings:"У этого админа есть брони, сначала отмени их",owner_locked:"Владельца менять нельзя",bad_input:"Проверь введённые данные",not_found:"Не найдено"};
+var ERR={busy:"Это время уже занято в выбранной комнате",bad_time:"Проверь время: «До» должно быть позже «С»",bad_rooms:"Выбери хотя бы одну комнату",bad_repeat:"Для повтора укажи число встреч от 2 до 52",not_admin:"Ты не админ",forbidden:"Нет прав на это действие",unauthorized:"Не удалось подтвердить Telegram. Закрой и открой приложение заново",exists:"Такой админ уже есть",has_bookings:"У этого админа есть брони, сначала отмени их",owner_locked:"Владельца менять нельзя",bad_input:"Проверь введённые данные",bad_username:"Неверный @username: от 5 символов, латиница, цифры и _",not_found:"Не найдено"};
 function errText(e){return(e&&ERR[e.error])||"Что-то пошло не так, попробуй ещё раз"}
-function sheet(h){document.getElementById("shbody").innerHTML=h;document.getElementById("sheet").className="sheet open"}
-function closeSheet(){document.getElementById("sheet").className="sheet"}
-function $(id){return document.getElementById(id)}
+function sheet(h){$("shbody").innerHTML=h;$("sheet").className="sheet open"}
+function closeSheet(){$("sheet").className="sheet"}
 function ask(msg,yes){
   try{if(Telegram.WebApp.showConfirm){Telegram.WebApp.showConfirm(msg,function(ok){if(ok)yes()});return}}catch(e){}
   if(confirm(msg))yes();
 }
 document.querySelector(".sh-bg").onclick=closeSheet;
 
-function bookForm(){
-  sheet('<h3>Новая бронь</h3>'+
-   '<span class="f">Комната</span><div class="chk"><label><input type="checkbox" id="r1" checked> Controll Room</label><label><input type="checkbox" id="r2"> Tone Room</label></div>'+
-   '<span class="f">Дата</span><input type="date" id="fd" value="'+iso(cur)+'">'+
-   '<div class="two"><div><span class="f">С</span><input type="time" id="ff" value="18:00" step="900"></div><div><span class="f">До</span><input type="time" id="ft" value="20:00" step="900"></div></div>'+
+function bookForm(b){
+  var ed=!!b;
+  var has=function(r){return ed&&b.rooms.indexOf(r)>-1};
+  sheet('<h3>'+(ed?'Изменить бронь':'Новая бронь')+'</h3>'+
+   '<span class="f">Комната</span><div class="chk"><label><input type="checkbox" id="r1"'+(ed?(has("Controll Room")?' checked':''):' checked')+'> Controll Room</label><label><input type="checkbox" id="r2"'+(has("Tone Room")?' checked':'')+'> Tone Room</label></div>'+
+   '<span class="f">Дата</span><input type="date" id="fd" value="'+(ed?b.date:iso(cur))+'">'+
+   '<div class="two"><div><span class="f">С</span><input type="time" id="ff" value="'+(ed?b.from:"18:00")+'" step="900"></div><div><span class="f">До</span><input type="time" id="ft" value="'+(ed?(b.to==="24:00"?"00:00":b.to):"20:00")+'" step="900"></div></div>'+
    '<span class="f">Комментарий / проект</span><textarea id="fn" rows="2" maxlength="300"></textarea>'+
-   '<div class="err" id="ferr"></div><button class="btn" id="fsave">Записать</button><button class="btn gray" id="fclose">Закрыть</button>');
-  $("fclose").onclick=closeSheet;
+   (ed?'':'<span class="f">Повторять</span><select id="frep"><option value="0">Не повторять</option><option value="1">Каждую неделю</option><option value="2">Раз в 2 недели</option></select>'+
+   '<div id="fcnt" style="display:none"><span class="f">Сколько всего встреч (считая первую)</span><input type="number" id="fc" value="4" min="2" max="52"></div>')+
+   '<div class="err" id="ferr"></div><button class="btn" id="fsave">'+(ed?'Сохранить':'Записать')+'</button><button class="btn gray" id="fclose">Закрыть</button>');
+  if(ed)$("fn").value=b.note||"";
+  if(!ed)$("frep").onchange=function(){$("fcnt").style.display=$("frep").value==="0"?"none":"block"};
+  $("fclose").onclick=function(){if(ed)detail(b.g);else closeSheet()};
   $("fsave").onclick=function(){
     var rooms=[];if($("r1").checked)rooms.push("Controll Room");if($("r2").checked)rooms.push("Tone Room");
     var to=$("ft").value;if(to==="00:00")to="24:00";
     if(!rooms.length||!$("fd").value||!$("ff").value||!to){$("ferr").textContent=!rooms.length?ERR.bad_rooms:"Заполни дату и время";return}
+    var data={rooms:rooms,date:$("fd").value,from:$("ff").value,to:to,note:$("fn").value},act="update_booking";
+    if(ed)data.group_id=b.g;
+    else{act="create";var ev=+$("frep").value;data.every=ev;data.count=ev?(+$("fc").value||0):1;
+      if(ev&&(data.count<2||data.count>52)){$("ferr").textContent=ERR.bad_repeat;return}}
     var btn=$("fsave");btn.disabled=true;$("ferr").textContent="";
-    call("create",{rooms:rooms,date:$("fd").value,from:$("ff").value,to:to,note:$("fn").value}).then(function(){
-      var p=$("fd").value.split("-");cur=new Date(+p[0],+p[1]-1,+p[2],12);view="day";
-      closeSheet();return load();
+    call(act,data).then(function(r){
+      var p=data.date.split("-");cur=new Date(+p[0],+p[1]-1,+p[2],12);view="day";
+      return load().then(function(){
+        if(r&&r.skipped&&r.skipped.length)resultSheet(r);else closeSheet();
+      });
     }).catch(function(e){btn.disabled=false;$("ferr").textContent=errText(e)});
   };
+}
+function resultSheet(r){
+  sheet('<h3>Готово</h3><div class="kv"><span>Создано встреч:</span> '+r.created+'</div>'+
+   '<div class="kv"><span>Пропущено, время занято:</span> '+r.skipped.map(fmtD).join(", ")+'</div>'+
+   '<button class="btn" id="okb">Ок</button>');
+  $("okb").onclick=closeSheet;
 }
 
 function detail(g){
   var b=bookings.filter(function(x){return x.g===g})[0];if(!b)return;
+  curG=g;
   var can=ME&&(ME.is_owner||ME.telegram_id===b.aid);
   var p=b.date.split("-");
   sheet('<h3>'+esc(b.who)+'</h3>'+
    '<div class="kv"><span>Комнаты:</span> '+esc(b.rooms.join(", "))+'</div>'+
    '<div class="kv"><span>Дата:</span> '+(+p[2])+' '+MON[+p[1]-1]+' '+p[0]+'</div>'+
    '<div class="kv"><span>Время:</span> '+b.from+'–'+b.to+'</div>'+
+   (b.s?'<div class="kv"><span>Повторяющаяся бронь ↻</span></div>':'')+
    (b.note?'<div class="kv"><span>Комментарий:</span> '+esc(b.note)+'</div>':'')+
+   (ME?'<div class="cmts"><h4>Обсуждение</h4><div id="cmt" class="hint">Загрузка…</div><textarea id="cin" rows="2" maxlength="500" placeholder="Написать комментарий"></textarea><button class="btn alt" id="csend">Отправить</button></div>':'')+
    '<div class="err" id="derr"></div>'+
-   (can?'<button class="btn red" id="dcancel">Отменить бронь</button>':'')+
+   (can?'<button class="btn" id="dedit">Перенести / изменить</button>'+
+     (b.s?'<button class="btn red" id="dcancel">Отменить только эту</button><button class="btn red" id="dcancelall">Отменить эту и все следующие</button>':'<button class="btn red" id="dcancel">Отменить бронь</button>'):'')+
    '<button class="btn gray" id="dclose">Закрыть</button>');
   $("dclose").onclick=closeSheet;
-  if(can)$("dcancel").onclick=function(){
-    ask("Отменить эту бронь?",function(){
-      call("cancel",{group_id:g}).then(function(){closeSheet();return load()}).catch(function(e){$("derr").textContent=errText(e)});
-    });
-  };
+  if(ME){
+    commentsLoad(g);
+    $("csend").onclick=function(){
+      var v=$("cin").value.trim();if(!v)return;
+      var btn=$("csend");btn.disabled=true;
+      call("comment_add",{group_id:g,body:v}).then(function(){$("cin").value="";btn.disabled=false;commentsLoad(g)}).catch(function(e){btn.disabled=false;$("derr").textContent=errText(e)});
+    };
+  }
+  if(can){
+    $("dedit").onclick=function(){bookForm(b)};
+    var doCancel=function(scope,msg){ask(msg,function(){
+      call("cancel",{group_id:g,scope:scope}).then(function(){closeSheet();return load()}).catch(function(e){$("derr").textContent=errText(e)});
+    })};
+    $("dcancel").onclick=function(){doCancel("one",b.s?"Отменить только эту встречу?":"Отменить эту бронь?")};
+    if(b.s)$("dcancelall").onclick=function(){doCancel("following","Отменить эту и все следующие встречи серии?")};
+  }
+}
+function commentsLoad(g){
+  call("comments",{group_id:g}).then(function(r){
+    var el=$("cmt");if(!el||curG!==g)return;
+    el.className="";
+    el.innerHTML=r.comments.length?r.comments.map(function(c){var t=loc(c.at);
+      return '<div class="cm"><div class="ch"><i class="dot" style="background:'+esc(c.color)+'"></i><b>'+esc(c.name)+'</b><span>'+fmtD(t.d)+' '+t.t+'</span>'+(c.can?'<button data-cdel="'+c.id+'" title="Удалить">×</button>':'')+'</div><div>'+esc(c.body)+'</div></div>'}).join(""):'<div class="hint">Пока нет комментариев</div>';
+  }).catch(function(){var el=$("cmt");if(el)el.textContent="Не удалось загрузить комментарии"});
 }
 
 function adminPanel(){
   var h='<h3>Админы</h3>';
   ADM.forEach(function(a){
-    h+='<div class="arow"><input type="color" value="'+esc(a.color)+'" data-c="'+a.telegram_id+'"><div class="nm">'+esc(a.name)+(a.is_owner?' · владелец':'')+'<small>ID '+a.telegram_id+(a.telegram_id<0?' (временный)':'')+'</small></div>'+(a.is_owner?'':'<button data-rm="'+a.telegram_id+'">Убрать</button>')+'</div>';
-    if(a.telegram_id<0)h+='<div class="arow"><input type="number" placeholder="Настоящий Telegram ID" data-newid="'+a.telegram_id+'"><button data-fix="'+a.telegram_id+'">Заменить ID</button></div>';
+    var sub=a.telegram_id<0?(a.username?'@'+esc(a.username)+' · ждёт первого входа в бота':'временный, привяжи ниже'):('ID '+a.telegram_id+(a.username?' · @'+esc(a.username):''));
+    h+='<div class="arow"><input type="color" value="'+esc(a.color)+'" data-c="'+a.telegram_id+'"><div class="nm">'+esc(a.name)+(a.is_owner?' · владелец':'')+'<small>'+sub+'</small></div>'+(a.is_owner?'':'<button data-rm="'+a.telegram_id+'">Убрать</button>')+'</div>';
+    if(a.telegram_id<0&&!a.username)h+='<div class="arow"><input type="text" placeholder="@username или Telegram ID" data-link="'+a.telegram_id+'"><button data-dolink="'+a.telegram_id+'">Привязать</button></div>';
   });
   h+='<span class="f" style="margin-top:18px">Добавить админа</span>'+
-   '<input type="number" id="na_id" placeholder="Telegram ID (число)">'+
+   '<input type="text" id="na_who" placeholder="@username или Telegram ID">'+
    '<input type="text" id="na_name" placeholder="Имя в календаре" style="margin-top:8px">'+
    '<div style="display:flex;align-items:center;gap:10px;margin-top:10px"><span class="f" style="margin:0">Цвет</span><input type="color" id="na_col" value="#4f8cff"></div>'+
+   '<div class="hint">Для @username человек должен один раз открыть бота, после этого доступ появится сам.</div>'+
    '<div class="err" id="aerr"></div><button class="btn" data-add="1">Добавить</button><button class="btn gray" id="aclose">Закрыть</button>';
   sheet(h);$("aclose").onclick=closeSheet;
 }
 function adminDo(action,data){
   return call(action,data).then(function(){return load()}).then(adminPanel).catch(function(e){var el=$("aerr");if(el)el.textContent=errText(e);else alert(errText(e))});
 }
+function whoPayload(v){return /^\d+$/.test(v)?{telegram_id:+v}:{username:v}}
 $("shbody").addEventListener("change",function(e){
   var t=e.target;if(t.dataset&&t.dataset.c)adminDo("admin_update",{telegram_id:+t.dataset.c,color:t.value});
 });
 $("shbody").addEventListener("click",function(e){
   var t=e.target;if(!t.dataset)return;
-  if(t.dataset.rm){var id=+t.dataset.rm;ask("Убрать этого админа?",function(){adminDo("admin_remove",{telegram_id:id})})}
-  else if(t.dataset.fix){var old=+t.dataset.fix,inp=document.querySelector('[data-newid="'+old+'"]');
-    if(!inp.value){$("aerr").textContent="Впиши настоящий Telegram ID";return}
-    adminDo("admin_update",{telegram_id:old,new_id:+inp.value})}
+  if(t.dataset.cdel){call("comment_delete",{id:+t.dataset.cdel}).then(function(){commentsLoad(curG)}).catch(function(er){var d=$("derr");if(d)d.textContent=errText(er)})}
+  else if(t.dataset.rm){var id=+t.dataset.rm;ask("Убрать этого админа?",function(){adminDo("admin_remove",{telegram_id:id})})}
+  else if(t.dataset.dolink){var old=+t.dataset.dolink,inp=document.querySelector('[data-link="'+old+'"]'),v=inp.value.trim().replace(/^@/,"");
+    if(!v){$("aerr").textContent="Впиши @username или Telegram ID";return}
+    var pl=whoPayload(v);adminDo("admin_update",pl.telegram_id?{telegram_id:old,new_id:pl.telegram_id}:{telegram_id:old,username:pl.username})}
   else if(t.dataset.add){
-    if(!$("na_id").value||!$("na_name").value.trim()){$("aerr").textContent="Заполни ID и имя";return}
-    adminDo("admin_add",{telegram_id:+$("na_id").value,name:$("na_name").value,color:$("na_col").value})}
+    var w=$("na_who").value.trim().replace(/^@/,"");
+    if(!w||!$("na_name").value.trim()){$("aerr").textContent="Заполни @username (или ID) и имя";return}
+    var q=whoPayload(w);q.name=$("na_name").value;q.color=$("na_col").value;adminDo("admin_add",q)}
 });
 
 function checkMe(){
@@ -280,7 +335,7 @@ function checkMe(){
     render();
   }).catch(function(){});
 }
-$("bBook").onclick=bookForm;
+$("bBook").onclick=function(){bookForm()};
 $("bAdm").onclick=adminPanel;
 
 try{if(window.Telegram&&Telegram.WebApp){Telegram.WebApp.ready();Telegram.WebApp.expand()}}catch(e){}
