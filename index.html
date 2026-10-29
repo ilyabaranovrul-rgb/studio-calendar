@@ -83,6 +83,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"
 .err{color:#e5484d;font-size:13px;margin-top:10px;min-height:16px}
 .hint{color:var(--muted);font-size:13px;margin:6px 0}
 .kv{font-size:14px;margin:6px 0}.kv span{color:var(--muted)}
+.lrow{padding:10px 0;border-top:1px solid var(--line)}.lrow b{display:block;font-size:14px;margin-bottom:6px}.lrow .lr{display:flex;gap:8px}.lrow input{flex:1;min-width:0;font-size:12px}.lrow button{border:0;background:var(--a);color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;flex:none}.gsteps{font-size:13px;color:var(--muted);line-height:1.5;margin:8px 0}.gsteps li{margin-bottom:4px}
 .arow{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
 .arow input[type=color]{width:32px;height:32px;border:0;padding:0;background:none;flex:none}
 .arow .nm{flex:1;font-size:14px;min-width:0}.arow .nm small{display:block;color:var(--muted)}
@@ -111,7 +112,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"
 <div class="actions" id="actions" style="display:none">
   <div class="arow2"><button id="bBook">+ Записать</button></div>
   <div class="arow2" id="ownrow" style="display:none"><button class="sec" id="bAdm">Админы</button><button class="sec" id="bStat">Статистика</button><button class="sec" id="bExp">Выгрузка</button></div>
-  <div class="arow2"><button class="sec" id="bNotif" style="display:none">🔔 Включить уведомления</button></div>
+  <div class="arow2"><button class="sec" id="bGcal" style="display:none">📅 Google Календарь</button><button class="sec" id="bNotif" style="display:none">🔔 Уведомления</button></div>
 </div>
 <div class="nav" id="navbar">
   <button id="prev">‹</button>
@@ -430,7 +431,8 @@ $("shbody").addEventListener("change",function(e){
 });
 $("shbody").addEventListener("click",function(e){
   var t=e.target;if(!t.dataset)return;
-  if(t.dataset.sm){statM.setMonth(statM.getMonth()+ +t.dataset.sm);statsPanel()}
+  if(t.dataset.copy){copyText(GL[t.dataset.copy],t.parentNode.querySelector("input"))}
+  else if(t.dataset.sm){statM.setMonth(statM.getMonth()+ +t.dataset.sm);statsPanel()}
   else if(t.dataset.cdel){call("comment_delete",{id:+t.dataset.cdel}).then(function(){commentsLoad(curG)}).catch(function(er){var d=$("derr");if(d)d.textContent=errText(er)})}
   else if(t.dataset.rm){var id=+t.dataset.rm;ask("Убрать этого админа?",function(){adminDo("admin_remove",{telegram_id:id})})}
   else if(t.dataset.dolink){var old=+t.dataset.dolink,inp=document.querySelector('[data-link="'+old+'"]'),v=inp.value.trim().replace(/^@/,"");
@@ -441,6 +443,28 @@ $("shbody").addEventListener("click",function(e){
     if(!w||!$("na_name").value.trim()){$("aerr").textContent="Заполни @username (или ID) и имя";return}
     var q=whoPayload(w);q.name=$("na_name").value;q.color=$("na_col").value;adminDo("admin_add",q)}
 });
+
+/* ---------- ссылки для Google Календаря ---------- */
+function gcalPanel(){
+  sheet('<h3>Google Календарь</h3><div class="hint">Загружаю ссылки…</div>');
+  call("feed_links").then(function(r){
+    var rows=r.links.map(function(l){
+      return '<div class="lrow"><b>'+esc(l.title)+'</b><div class="lr"><input type="text" readonly value="'+esc(l.url)+'"><button data-copy="'+esc(l.id)+'">Копировать</button></div></div>'}).join("");
+    sheet('<h3>Google Календарь</h3>'+rows+
+     '<ol class="gsteps"><li>Скопируй нужную ссылку.</li><li>Открой <b>calendar.google.com</b> в браузере (в приложении Google Календарь ссылки добавить нельзя).</li><li>Слева «Другие календари» → «+» → «Добавить по URL» → вставь ссылку.</li><li>Календарь появится и на телефоне сам. На iPhone: Настройки → Календарь → Учётные записи → Другое → Подписной календарь.</li></ol>'+
+     '<div class="hint">Брони идут из приложения в Google в одну сторону. Google обновляет такие календари раз в несколько часов, поэтому новая бронь появится не сразу. Ссылки секретные: не отправляй их посторонним.</div>'+
+     '<button class="btn gray" id="gclose">Закрыть</button>');
+    $("gclose").onclick=closeSheet;
+    GL={};r.links.forEach(function(l){GL[l.id]=l.url});
+  }).catch(function(e){sheet('<h3>Google Календарь</h3><div class="hint">'+esc(errText(e))+'</div><button class="btn gray" id="gclose">Закрыть</button>');$("gclose").onclick=closeSheet});
+}
+var GL={};
+function copyText(txt,inp){
+  function fb(){try{inp.focus();inp.select();inp.setSelectionRange(0,99999);var ok=document.execCommand("copy");say(ok?"Ссылка скопирована":"Выдели ссылку в поле и скопируй вручную")}catch(e){say("Выдели ссылку в поле и скопируй вручную")}}
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){say("Ссылка скопирована")},fb);return}}catch(e){}
+  fb();
+}
+$("bGcal").onclick=gcalPanel;
 
 /* ---------- кто я и кнопки админа ---------- */
 function notifInit(){
@@ -463,6 +487,7 @@ function checkMe(){
     ME=r.admin;
     $("actions").style.display="block";
     if(ME.is_owner)$("ownrow").style.display="flex";
+    $("bGcal").style.display="";
     notifInit();render();
   }).catch(function(){});
 }
